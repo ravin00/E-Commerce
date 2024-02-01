@@ -13,7 +13,7 @@ const App = () => {
       .get(`${server}/user/getuser`, { withCredentials: true })
       .then((res) => {
         toast.success(res.data.message);
-        console.log(res.data);
+        // console.log(res.data);
       })
       .catch((error) => {
         // Check if error.response is defined

@@ -13,26 +13,37 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   await axios.post(`${server}/user/login-user`,{
+  //     email,
+  //     password,
+  //   }, {withCredentials: true}).then((res) => {
+  //     toast.success("Login success!");
+  //     navigate("/");
+  //   }).catch((err) => {
+  //     toast.error(err.response.data.message);
+  //   })
+  // }
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
-      const response = await axios.post(
-        `${server}/user/login-user`,
-        {
-          email,
-          password,
-        },
-        { withCredentials: true }
-      );
-
-      toast.success("Login Success!");
-      navigate("/"); // Assuming you want to navigate to the home page
-    } catch (error) {
-      if (error.response) {
-        toast.error(error.response.data.message);
+      const response = await axios.post(`${server}/user/login-user`, {
+        email,
+        password,
+      }, { withCredentials: true });  
+      console.log(response);
+      toast.success("Login success!");
+      navigate("/");
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.message) {
+        toast.error(err.response.data.message);
       } else {
-        toast.error("An error occurred");
+        toast.error("An error occurred during login");
       }
     }
   };
