@@ -6,24 +6,12 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { server } from "./server";
+import { loadUser } from "./redux/actions/user.js";
+import Store from "./redux/store";
 
 const App = () => {
   useEffect(() => {
-    axios
-      .get(`${server}/user/getuser`, { withCredentials: true })
-      .then((res) => {
-        toast.success(res.data.message);
-        // console.log(res.data);
-      })
-      .catch((error) => {
-        // Check if error.response is defined
-        if (error.response) {
-          toast.error(error.response.data.message);
-        } else {
-          // Handle other types of errors
-          toast.error("An error occurred");
-        }
-      });
+    Store.dispatch(loadUser());
   }, []);
 
   return (
