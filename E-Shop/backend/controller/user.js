@@ -25,7 +25,7 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
         if (err) {
           console.log(err);
           res.status(500).json({ message: "Error deleting files" });
-        } 
+        }
       });
       return next(new ErrorHandler("User already exists", 400));
     }
@@ -44,26 +44,25 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
 
     const activationUrl = `http://localhost:3000/activation/${activationToken}`;
 
-    try{
+    console.log(activationUrl);
+
+    try {
       console.log("aaa");
       await sendMail({
-
         email: user.email,
         subject: "Activate your account",
         message: `Hello ${user.name}, please click on the link to activate your account: ${activationUrl}`,
-      })
+      });
       console.log("bbb");
 
       res.status(201).json({
         success: true,
-        message: `Please check your email:- ${user.email} to activate your account!`
-      })
+        message: `Please check your email:- ${user.email} to activate your account!`,
+      });
       console.log("ccc");
-
     } catch (error) {
-      return next(new ErrorHandler(error.message), 500)
+      return next(new ErrorHandler(error.message), 500);
     }
-
   } catch (error) {
     return next(new ErrorHandler(error.message), 400);
   }
@@ -77,40 +76,42 @@ const createActivationToken = (user) => {
 };
 
 //activate user
-router.post("/activation", catchAsyncErrors(async (req, res, next) => {
-try {
-  const {activation_token} = req.body;
+router.post(
+  "/activation",
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const { activation_token } = req.body;
 
-  const newUser = jwt.verify(activation_token, process.env.ACTIVATION_SECRET);
+      const newUser = jwt.verify(
+        activation_token,
+        process.env.ACTIVATION_SECRET
+      );
 
-  if(!newUser){
-    return next(new ErrorHandler("Invalid token", 400));
-  }
+      if (!newUser) {
+        return next(new ErrorHandler("Invalid token", 400));
+      }
 
-  const {name,email,password,avatar} = newUser;
+      const { name, email, password, avatar } = newUser;
 
-  let user = await User.findOne({email});
+      let user = await User.findOne({ email });
 
-  if(user){
-    return next(new ErrorHandler("User already exists", 400));
-  }
+      if (user) {
+        return next(new ErrorHandler("User already exists", 400));
+      }
 
-  user = await User.create({
-    name,
-    email,
-    avatar,
-    password,
-  });
+      user = await User.create({
+        name,
+        email,
+        avatar,
+        password,
+      });
 
-  sendToken(user, 201,res);
-}catch (error){
-  return next(new ErrorHandler(error.message, 500));
-}
-
-})
-
+      sendToken(user, 201, res);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
 );
-
 
 // router.post("/login-user",catchAsyncErrors(async(req,res,next) => {
 // console.log("hello")
@@ -142,11 +143,11 @@ try {
 //   }
 // }))
 
-//login user 
+//login user
 router.post(
   "/login-user",
   catchAsyncErrors(async (req, res, next) => {
-    console.log("eee")
+    console.log("eee");
     try {
       const { email, password } = req.body;
 
@@ -175,26 +176,44 @@ router.post(
   })
 );
 
-
 //load user
 
-router.get("/getuser", isAuthenticated, catchAsyncErrors(async(req,res,next) => {
-console.log("test1")
-  try{
-    const user = await User.findById(req.user.id);
- 
-    if(!user){
-      console.log("error1")
-      return next(new ErrorHandler("User doesn't exist",400));
+router.get(
+  "/getuser",
+  catchAsyncErrors(async (req, res, next) => {
+    console.log("test1");
+    try {
+      // const user = await User.find();
+
+      // if(!user){
+      //   console.log("error1")
+      //   return next(new ErrorHandler("User doesn't exist",400));
+      // }
+      // res.status(200).json({
+      //   success: true,
+      //   user,
+      // })
+
+      const user = await User.find({})
+        .then(function (user) {
+          if (!user) {
+            console.log("error1");
+            return next(new ErrorHandler("User doesn't exist", 400));
+          }
+          
+          res.status(200).json({
+            success: true,
+            user,
+          });
+        })
+        .catch(function (err) {
+          console.log(err);
+        });
+    } catch (error) {
+      console.log("error: ", error);
+      return next(new ErrorHandler(error.message, 500));
     }
-    res.status(200).json({
-      success: true,
-      user,
-    })
-  } catch(error) {
-    console.log(error)
-    return next(new ErrorHandler(error.message,500));
-  }
-}))
+  })
+);
 
 module.exports = router;

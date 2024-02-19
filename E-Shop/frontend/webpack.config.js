@@ -13,12 +13,14 @@ module.exports = {
   // Add resolve.fallback to include polyfills for node.js core modules
   resolve: {
     fallback: {
-      "crypto": require.resolve("crypto-browserify"),
+      // "crypto": require.resolve("crypto-browserify"),
+      "crypto": false,
+      "async_hooks": false,
       "fs": false,
       "http": require.resolve("stream-http"),
       "net": false,
       "querystring": require.resolve("querystring-es3"),
-      "zlib": require.resolve("browserify-zlib")
+      "zlib": require.resolve("browserify-zlib"),
     }
   },
   
